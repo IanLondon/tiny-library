@@ -1,0 +1,10 @@
+# Local dev sandbox for this project
+sandbox/
+# Files that end in secret or secrets have API keys
+*secret.*
+*secrets.*
+# virtualenv
+env/
+*.pyc
+# sqlite3 db
+*.db
