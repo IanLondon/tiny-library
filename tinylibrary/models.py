@@ -1,6 +1,7 @@
+from sqlalchemy.orm import validates
 from datetime import datetime
-from core import isbn
 
+from core import isbn
 from app import db
 
 class Book(db.Model):
@@ -15,8 +16,8 @@ class Book(db.Model):
     )
 
     def __init__(self, isbn13, inside_cover_id=None):
-        # TODO: ISBN10 conversion, ISBN13 validation. Use core/isbn.py
-        # How do you validate in sqlalchemy? Throw error?
+        # XXX: is this a good way to do validation? Should I use @validates instead?
+        # isbn13 = isbn.toI13(isbn13) # raises InvalidIsbn if bad
         self.isbn13 = isbn13
         self.inside_cover_id = inside_cover_id
         self.date_added = datetime.utcnow()
@@ -26,6 +27,12 @@ class Book(db.Model):
 
     def __repr__(self):
         return '<Book ISBN:%r inside_cover_id:%r added:%r>' % (self.isbn13, self.inside_cover_id, self.date_added)
+
+    @validates('isbn13')
+    def validate_isbn(self, key, isbn_raw):
+        """Convert to stripped ISBN13, validating in the process"""
+        # raises InvalidIsbn if bad
+        return isbn.toI13(isbn_raw)
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)

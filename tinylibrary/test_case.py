@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from models import *
 import views
+from core.isbn import InvalidIsbn, randIsbn10, randIsbn13
 
 class DumbTest(TestCase):
 
@@ -34,11 +35,23 @@ class DumbTest(TestCase):
     def test_book_isbn_coverid_unique(self):
         """Do not permit 2 books with same isbn13 and same inside_cover_id"""
 
-        b1 = Book('4848484848484','999')
-        b2 = Book('4848484848484','999')
+        same_isbn = randIsbn13()
+        same_inner_cover = 'ABC'
+
+        b1 = Book(same_isbn, same_inner_cover)
+        b2 = Book(same_isbn, same_inner_cover)
+
         db.session.add(b1)
         db.session.add(b2)
         self.assertRaises(IntegrityError, db.session.commit)
+
+    def test_book_isbn10(self):
+        b = Book(randIsbn10())
+        db.session.add(b)
+        db.session.commit()
+
+    def test_book_isbn_validation(self):
+        self.assertRaises(InvalidIsbn, Book, '123')
 
 if __name__ == '__main__':
     unittest.main()

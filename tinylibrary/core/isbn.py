@@ -6,7 +6,10 @@
 # Free GPL code
 # Last updated: 14/8/2007
 
+# Modified for tinylibrary by Ian London
+
 import sys,re
+from random import randint
 
 __doc__="""Code for messing with ISBN numbers. Stuff for validating ISBN-10 and
 ISBN-13 numbers, computing check digits and converting from one format
@@ -55,6 +58,12 @@ Free GPL code, Copyright (C) 2007 Darren J Wilkinson
 http://www.staff.ncl.ac.uk/d.j.wilkinson/
 """
 
+class InvalidIsbn(Exception):
+    def __init__(self, bad_isbn):
+        self.bad_isbn = bad_isbn
+    def __str__(self):
+        return repr(self.bad_isbn)
+
 def isbn_strip(isbn):
     """Strip whitespace, hyphens, etc. from an ISBN number and return
 the result."""
@@ -65,7 +74,7 @@ def convert(isbn):
     """Convert an ISBN-10 to ISBN-13 or vice-versa."""
     short=isbn_strip(isbn)
     if (isValid(short)==False):
-        raise "Invalid ISBN"
+        raise InvalidIsbn(isbn)
     if len(short)==10:
         stem="978"+short[:-1]
         return stem+check(stem)
@@ -74,7 +83,7 @@ def convert(isbn):
             stem=short[3:-1]
             return stem+check(stem)
         else:
-            raise "ISBN not convertible"
+            raise InvalidIsbn(isbn)
 
 def isValid(isbn):
     """Check the validity of an ISBN. Works for either ISBN-10 or ISBN-13."""
@@ -175,7 +184,7 @@ def toI10(isbn):
     """Converts supplied ISBN (either ISBN-10 or ISBN-13) to a stripped
 ISBN-10."""
     if (isValid(isbn)==False):
-        raise "Invalid ISBN"
+        raise InvalidIsbn(isbn)
     if isI10(isbn):
         return isbn_strip(isbn)
     else:
@@ -185,7 +194,7 @@ def toI13(isbn):
     """Converts supplied ISBN (either ISBN-10 or ISBN-13) to a stripped
 ISBN-13."""
     if (isValid(isbn)==False):
-        raise "Invalid ISBN"
+        raise InvalidIsbn(isbn)
     if isI13(isbn):
         return isbn_strip(isbn)
     else:
@@ -208,8 +217,24 @@ not recognised), "amazon", "amazon-uk", "blackwells".
     else:
         return "http://books.google.com/books?vid="+short
 
+def randIsbn(isbn13):
+    """Returns a random, checkdigit-valid ISBN."""
+    if isbn13:
+        #ISBN13, minus check digit
+        digits = 12
+    else:
+        #ISBN10, minus check digit
+        digits = 9
 
+    short = ''.join(['%s' % randint(0,9) for _ in range(0,digits)])
+    valid_isbn = short + check(short)
+    return valid_isbn
 
+def randIsbn13():
+    return randIsbn(isbn13=True)
+
+def randIsbn10():
+    return randIsbn(isbn13=False)
 
 if __name__=='__main__':
     isbn="1-58488-540-8"
@@ -228,4 +253,3 @@ For help/information, do "python", "import isbn", "help(isbn)".
 
 
 # eof
-
