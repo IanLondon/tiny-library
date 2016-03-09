@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from models import db, Book, Room, Checkout
 from flask_sqlalchemy import SQLAlchemy
 
@@ -27,10 +27,14 @@ def init_db(add_stuff=False):
             db.session.commit()
             print 'added some data'
 
-@app.route('/')
-def test_output():
-    print Book.query.all()
-    return ' '.join([b.isbn13 for b in Book.query.all()])
+##########
+# Routes #
+##########
+
+@app.route('/books/')
+def all_books():
+    return render_template('show_books.html', books=Book.query.all())
+
 
 if __name__ == '__main__':
     app.run(debug=True)

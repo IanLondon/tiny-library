@@ -1,0 +1,10 @@
+<html>
+<body>
+    <table>
+        <tr><th>ISBN</th><th>Inside cover ID</th><th>Date added</th></tr>
+        {% for book in books %}
+        <tr><td>{{ book.isbn13 }}</td><td>{{ book.inside_cover_id }}</td><td>{{ book.date_added }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

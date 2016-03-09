@@ -15,6 +15,7 @@ class Book(db.Model):
     )
 
     def __init__(self, isbn13, inside_cover_id=None):
+        # TODO: ISBN10 conversion, ISBN13 validation. Use core/isbn.py
         self.isbn13 = isbn13
         self.inside_cover_id = inside_cover_id
         self.date_added = datetime.utcnow()
