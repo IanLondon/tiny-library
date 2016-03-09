@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from models import db, Book, Room, Checkout
 from flask_sqlalchemy import SQLAlchemy
 
@@ -31,9 +31,21 @@ def init_db(add_stuff=False):
 # Routes #
 ##########
 
-@app.route('/books/')
-def all_books():
+@app.route('/books/', methods=['GET','POST','DELETE'])
+def show_books():
     return render_template('show_books.html', books=Book.query.all())
+
+# innercover_id is optional
+@app.route('/books/<isbn>', methods=['GET','POST','DELETE'])
+@app.route('/books/<isbn>/<inside_cover_id>', methods=['GET','POST','DELETE'])
+def single_book(isbn=None, inside_cover_id=None):
+    print 'DEBUG: got single book ', isbn, inside_cover_id
+    if request.method == 'GET':
+        return 'GET not implemented!'
+    if request.method == 'POST':
+        return 'Post not implemented!'
+    if request.method == 'DELETE':
+        return 'Delete not implemented!'
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from core import isbn
 
 db = SQLAlchemy()
 
@@ -16,9 +17,13 @@ class Book(db.Model):
 
     def __init__(self, isbn13, inside_cover_id=None):
         # TODO: ISBN10 conversion, ISBN13 validation. Use core/isbn.py
+        # How do you validate in sqlalchemy? Throw error?
         self.isbn13 = isbn13
         self.inside_cover_id = inside_cover_id
         self.date_added = datetime.utcnow()
+        # TODO: is this where a call to get Google Books data should go? NO.
+        # No, no, no. That should only happen when a book is committed!
+        # I don't want to fetch data when I do `b = Book(blah, blah)`!!
 
     def __repr__(self):
         return '<Book ISBN:%r inside_cover_id:%r added:%r>' % (self.isbn13, self.inside_cover_id, self.date_added)
