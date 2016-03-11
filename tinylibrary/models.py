@@ -10,23 +10,22 @@ from core.isbn import toI13
 from core.fetch_book_info import google_books_info
 from app import db
 
-def normalize_url(raw_url):
-    """Lowercase and prepend 'http://' to url. Ensure there's no non-http scheme."""
-    url = raw_url.lower()
+def normalize_url(url):
+    """prepend 'http://' to url. Ensure there's no non-http(s) scheme."""
     disassembled_url = urlparse(url)
     if disassembled_url.scheme == '':
         url = 'http://' + url
-    elif disassembled_url.scheme != 'http':
+    elif disassembled_url.scheme not in ['http', 'https']:
         raise ValueError('Bad URL scheme')
     return url
 
-def normalize_img_url(raw_url):
-    url = normalize_url(raw_url)
-    disassembled_url = urlparse(url)
-    filename, file_ext = splitext(basename(disassembled_url.path))
-    imgtypes = '.jpg .jpeg .gif .png .apng .bmp .ico'.split()
-    assert file_ext in imgtypes
-    return url
+# def normalize_img_url(raw_url):
+#     url = normalize_url(raw_url)
+#     disassembled_url = urlparse(url)
+#     filename, file_ext = splitext(basename(disassembled_url.path))
+#     imgtypes = '.jpg .jpeg .gif .png .apng .bmp .ico'.split()
+#     assert file_ext in imgtypes
+#     return url
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,7 +58,7 @@ class Book(db.Model):
     def validate_optional_img_url(self, key, url):
         if url is None:
             return None
-        return normalize_img_url(url)
+        return normalize_url(url)
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
