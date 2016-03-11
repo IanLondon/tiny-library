@@ -1,24 +1,24 @@
-<html>
-<body>
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>ISBN</th>
-            <th>Inside cover ID</th>
-            <th>Description</th>
-            <th>Date added</th>
-            <th>Cover Image</th>
-        </tr>
-        {% for book in books %}
-        <tr>
-            <td><a href="{{ url_for('single_book', isbn=book.isbn13, inside_cover_id=book.inside_cover_id)}}">{{ book.title }}</a></td>
-            <td>{{ book.isbn13 }}</td>
-            <td>{{ book.inside_cover_id }}</td>
-            <td>{{ book.description }}</td>
-            <td>{{ book.date_added }}</td>
-            <td>{% if book.thumbnail_url %}<img src="{{ book.thumbnail_url }}">{% endif %}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}All the books{% endblock %}
+{% block body %}
+<table>
+    <tr>
+        <th>Title</th>
+        <th>ISBN</th>
+        <th>Inside cover ID</th>
+        <th>Description</th>
+        <th>Date added</th>
+        <th>Cover Image</th>
+    </tr>
+    {% for book in books %}
+    <tr>
+        <td><a href="{{ url_for('single_book', isbn=book.isbn13, inside_cover_id=book.inside_cover_id)}}">{{ book.title }}</a></td>
+        <td>{{ book.isbn13 }}</td>
+        <td>{{ book.inside_cover_id }}</td>
+        <td>{{ book.description }}</td>
+        <td>{{ book.date_added }}</td>
+        <td>{% if book.thumbnail_url %}<img src="{{ book.thumbnail_url }}">{% endif %}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
