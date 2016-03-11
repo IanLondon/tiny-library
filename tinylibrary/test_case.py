@@ -45,6 +45,18 @@ class DumbTest(TestCase):
         db.session.add(b2)
         self.assertRaises(IntegrityError, db.session.commit)
 
+    def test_book_isbn_coverid_diff(self):
+        """Permit 2 books with same isbn13 as long as inside_cover_ids are different"""
+
+        same_isbn = randIsbn13()
+
+        b1 = Book(same_isbn, '1')
+        b2 = Book(same_isbn, '2')
+
+        db.session.add(b1)
+        db.session.add(b2)
+        db.session.commit()
+
     def test_book_isbn10(self):
         b = Book(randIsbn10())
         db.session.add(b)
@@ -52,6 +64,13 @@ class DumbTest(TestCase):
 
     def test_book_isbn_validation(self):
         self.assertRaises(InvalidIsbn, Book, '123')
+
+    def test_books_info_scraping(self):
+        hunger_games_isbn = '9780545586177'
+        b = Book(hunger_games_isbn)
+        db.session.add(b)
+        db.session.commit()
+        print "IsbnCache:", IsbnCache.query.all()
 
 if __name__ == '__main__':
     unittest.main()

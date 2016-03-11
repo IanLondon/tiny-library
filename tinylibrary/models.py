@@ -1,46 +1,69 @@
-from sqlalchemy.orm import validates
+from urlparse import urlparse
+from os.path import splitext, basename
 from datetime import datetime
 
-from core import isbn
+from sqlalchemy import event
+from sqlalchemy.orm import validates
+from sqlalchemy.sql import func
+
+from core.isbn import toI13
+from core.fetch_book_info import google_books_info
 from app import db
+
+def normalize_url(raw_url):
+    """Lowercase and prepend 'http://' to url. Ensure there's no non-http scheme."""
+    url = raw_url.lower()
+    disassembled_url = urlparse(url)
+    if disassembled_url.scheme == '':
+        url = 'http://' + url
+    elif disassembled_url.scheme != 'http':
+        raise ValueError('Bad URL scheme')
+    return url
+
+def normalize_img_url(raw_url):
+    url = normalize_url(raw_url)
+    disassembled_url = urlparse(url)
+    filename, file_ext = splitext(basename(disassembled_url.path))
+    imgtypes = '.jpg .jpeg .gif .png .apng .bmp .ico'.split()
+    assert file_ext in imgtypes
+    return url
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     isbn13 = db.Column(db.String(13))
-    inside_cover_id = db.Column(db.String(20))
-    date_added = db.Column(db.DateTime)
+    inside_cover_id = db.Column(db.String(30))
+
+    title = db.Column(db.String)
+    description = db.Column(db.String)
+    thumbnail_url = db.Column(db.String)
+
+    date_added = db.Column(db.DateTime, default=func.now())
+
     #TODO: status
 
     __table_args__ = (
         db.UniqueConstraint('isbn13', 'inside_cover_id', name='_isbn_coverid_uc'),
     )
 
-    def __init__(self, isbn13, inside_cover_id=None):
-        # XXX: is this a good way to do validation? Should I use @validates instead?
-        # isbn13 = isbn.toI13(isbn13) # raises InvalidIsbn if bad
-        self.isbn13 = isbn13
-        self.inside_cover_id = inside_cover_id
-        self.date_added = datetime.utcnow()
-        # TODO: is this where a call to get Google Books data should go? NO.
-        # No, no, no. That should only happen when a book is committed!
-        # I don't want to fetch data when I do `b = Book(blah, blah)`!!
-
     def __repr__(self):
-        return '<Book ISBN:%r inside_cover_id:%r added:%r>' % (self.isbn13, self.inside_cover_id, self.date_added)
+        return '<Book isbn13=%r, inside_cover_id=%r, date_added=%r, title=%r>' % (
+            self.isbn13, self.inside_cover_id, self.date_added, self.title)
 
     @validates('isbn13')
     def validate_isbn(self, key, isbn_raw):
         """Convert to stripped ISBN13, validating in the process"""
         # raises InvalidIsbn if bad
-        return isbn.toI13(isbn_raw)
+        return toI13(isbn_raw)
+
+    @validates('thumbnail_url')
+    def validate_optional_img_url(self, key, url):
+        if url is None:
+            return None
+        return normalize_img_url(url)
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
-
-    def __init__(self, id, name):
-        self.id = id
-        self.name = name
 
     def __repr__(self):
         return '<Room id:%r name:%r>' % (self.id, self.name)
@@ -58,14 +81,5 @@ class Checkout(db.Model):
     room = db.relationship('Room',
         backref=db.backref('checkouts', lazy='dynamic'))
 
-    def __init__(self, book, room, checkout_date=None):
-        self.book = book
-        self.room = room
-        if checkout_date is None:
-            checkout_date = datetime.utcnow()
-        self.checkout_date = checkout_date
-
     def __repr__(self):
         return '<Checkout %r to %r from %r to %r>' % (self.book, self.room, self.checkout_date, self.return_date)
-
-#TODO: IsbnCache table

@@ -3,19 +3,23 @@ from app import app, db
 from models import Book, Room, Checkout
 from views import *
 
+def clear_db():
+    db.drop_all()
+    print 'deleted tables'
+
 def init_db():
     db.create_all()
     print 'created tables'
 
 def populate_db():
-    book1 = Book('3232323232154','A')
-    book2 = Book('3213216546548')
+    book1 = Book(isbn13='7796594424423', inside_cover_id='A')
+    book2 = Book(isbn13='9702999994186')
 
-    room1 = Room('1', 'Ms Foo')
-    room2 = Room('2', 'Mr Spam')
+    room1 = Room(id='1', name='Ms Foo')
+    room2 = Room(id='2', name='Mr Spam')
 
-    co1 = Checkout(book1, room1)
-    co2 = Checkout(book2, room2)
+    co1 = Checkout(book=book1, room=room1)
+    co2 = Checkout(book=book2, room=room2)
 
     for rec in (book1, book2, room1, room2, co1, co2):
         db.session.add(rec)
