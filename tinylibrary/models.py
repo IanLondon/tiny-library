@@ -48,6 +48,17 @@ class Book(db.Model):
         return '<Book isbn13=%r, inside_cover_id=%r, date_added=%r, title=%r>' % (
             self.isbn13, self.inside_cover_id, self.date_added, self.title)
 
+    def append_google_book_data(self):
+        if not self.isbn13:
+            raise ValueError('No isbn13')
+        google_data = google_books_info(self.isbn13)
+        self.title = google_data['title']
+        self.description = google_data['description']
+        self.thumbnail_url = google_data['imageLinks']['smallThumbnail']
+
+        # allow chaining
+        return self
+
     @validates('isbn13')
     def validate_isbn(self, key, isbn_raw):
         """Convert to stripped ISBN13, validating in the process"""

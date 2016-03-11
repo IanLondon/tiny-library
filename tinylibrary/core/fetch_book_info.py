@@ -10,7 +10,7 @@ def google_books_info(isbn):
         # print "Warning: google_books_info expected one item, got %s" % data['totalItems']
         return False
 
-    datadict = data['items'][0]['volumeInfo']
+    google_data = data['items'][0]['volumeInfo']
 
     # The keys in datadict should be:
         # publisher <type 'unicode'>
@@ -37,9 +37,7 @@ def google_books_info(isbn):
         # infoLink <type 'unicode'>
         # categories  --> list of strings, eg [u'Juvenile Fiction']
         # averageRating <type 'float'>
-
-
-    return datadict
+    return google_data
 
 if __name__ == "__main__":
     # get info for Hunger Games Catching Fire
