@@ -29,12 +29,12 @@ def normalize_url(url):
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    isbn13 = db.Column(db.String(13), info = {'label': 'ISBN'})
-    inside_cover_id = db.Column(db.String(30), info = {'label': 'Custom ID'})
+    isbn13 = db.Column(db.String(13))
+    inside_cover_id = db.Column(db.String(30))
 
-    title = db.Column(db.String, info = {'label': 'Title'})
-    description = db.Column(db.String, info = {'label': 'Description'})
-    thumbnail_url = db.Column(db.String, info = {'label': 'Thumbnail image URL'})
+    title = db.Column(db.String)
+    description = db.Column(db.String)
+    thumbnail_url = db.Column(db.String)
 
     date_added = db.Column(db.DateTime, default=func.now())
 
