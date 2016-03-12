@@ -1,4 +1,4 @@
-from wtforms.validators import ValidationError
+from wtforms import validators
 from core.isbn import toI13, InvalidIsbn
 
 # These are validators for WTForms.
@@ -13,4 +13,4 @@ class ValidateIsbn(object):
         try:
             toI13(isbn)
         except InvalidIsbn:
-            raise ValidationError(self.message)
+            raise validators.ValidationError(self.message)

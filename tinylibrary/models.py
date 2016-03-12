@@ -12,6 +12,8 @@ from app import db
 
 def normalize_url(url):
     """prepend 'http://' to url. Ensure there's no non-http(s) scheme."""
+    if not url:
+        return None
     disassembled_url = urlparse(url)
     if disassembled_url.scheme == '':
         url = 'http://' + url

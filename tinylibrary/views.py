@@ -5,7 +5,7 @@ from wtforms import StringField, HiddenField, validators
 
 # from wtforms_alchemy import model_form_factory
 
-from app import app
+from app import app, db
 from models import Book, Room, Checkout
 from validators import ValidateIsbn
 
@@ -18,7 +18,7 @@ class AddBookForm(Form):
     inside_cover_id = StringField(label='Custom ID')
     title = StringField()
     description = StringField()
-    thumbnail_url = URLField(validators=[validators.url()])
+    thumbnail_url = URLField(validators=[validators.url])
 
 
 # BaseModelForm and ModelForm stuff is boilerplate
@@ -45,6 +45,12 @@ def add_books():
     add_book_form = AddBookForm()
     if add_book_form.validate_on_submit():
         print 'got add book form %s' % add_book_form
+
+        new_book = Book(isbn13=add_book_form.isbn13.data, inside_cover_id=add_book_form.inside_cover_id.data, title=add_book_form.title.data, description=add_book_form.description.data, thumbnail_url=add_book_form.thumbnail_url.data)
+
+        db.session.add(new_book)
+        db.session.commit()
+
         flash('Added ISBN#%s "%s"' % (add_book_form.isbn13.data, add_book_form.title.data), category='success')
         return redirect((url_for('add_books')))
     if add_book_form.is_submitted():

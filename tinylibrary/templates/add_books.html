@@ -23,4 +23,10 @@
     {% endfor %}</ul>
     <input type="submit" value="+">
 </form>
+<img id="cover_img" src="{{ url_for('static', filename='img/iranian_cover.jpg') }}" alt='book cover image'>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/isbnjs-1.0.0/isbn.js') }}"></script>
+<script src="{{ url_for('static', filename='js/add_books.js') }}"></script>
 {% endblock %}
