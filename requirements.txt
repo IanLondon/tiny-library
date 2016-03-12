@@ -3,3 +3,4 @@ Flask-SQLAlchemy==2.1
 Flask-Testing==0.4.2
 Flask-WTF==0.12
 requests==2.9.1
+WTForms-Alchemy==0.15.0
