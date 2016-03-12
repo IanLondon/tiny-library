@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block body %}
+<div id='title'>Title: {{ book.title }}</div>
+<div id='isbn13'>ISBN13: {{ book.isbn13 }}</div>
+<div id='inside_cover_id'>Custom ID: {{ book.inside_cover_id }}</div>
+<div id='description'>Description: {{ book.description }}</div>
+<img id="thumbnail_img" src="{{book.thumbnail_url}}">
+{% endblock %}

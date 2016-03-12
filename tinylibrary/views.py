@@ -40,7 +40,7 @@ class AddBookForm(Form):
 # Views #
 #########
 
-@app.route('/add_books/', methods=['GET','POST'])
+@app.route('/add_books', methods=['GET','POST'])
 def add_books():
     add_book_form = AddBookForm()
     if add_book_form.validate_on_submit():
@@ -57,13 +57,20 @@ def add_books():
         flash('There was an error with your submission', category='error')
     return render_template('add_books.html', form=add_book_form)
 
-@app.route('/books/')
-def show_books():
+@app.route('/books')
+def books():
+    if 'isbn13' in request.args:
+        # you could also query by all possible args with Book.query.filter_by(**request.args)
+        bk = Book.query.filter_by(
+            isbn13=request.args.get('isbn13'),
+            inside_cover_id=request.args.get('inside_cover_id')
+        ).first_or_404()
+        return render_template('single_book.html', book=bk)
     return render_template('show_books.html', books=Book.query.all())
 
 
-# inside_cover_id is optional
-@app.route('/books/<isbn>')
-@app.route('/books/<isbn>/<inside_cover_id>')
-def single_book(isbn=None, inside_cover_id=None):
-    return 'GET not implemented!'
+# # inside_cover_id is optional
+# @app.route('/books/<isbn>')
+# @app.route('/books/<isbn>&id=<inside_cover_id>')
+# def single_book(isbn=None, inside_cover_id=None):
+#     return 'GET not implemented!'
