@@ -1,12 +1,14 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_wtf import Form
-from wtforms.fields.html5 import URLField
+from wtforms.fields.html5 import URLField, DateTimeField
 from wtforms import StringField, HiddenField, validators
+from datetime import datetime
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 # from wtforms_alchemy import model_form_factory
 
-from app import app, db
-from models import Book, Room, Checkout
+from tinylibrary.models import Book, Room, Checkout
+from tinylibrary import app, db
 from validators import ValidateIsbn
 
 #########
@@ -19,6 +21,13 @@ class AddBookForm(Form):
     title = StringField()
     description = StringField()
     thumbnail_url = URLField(validators=[validators.url])
+
+class CheckoutForm(Form):
+    checkout_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
+    # room = QuerySelectField(query_factory=Room.query.all, allow_blank=False)
+    room = QuerySelectField(query_factory=lambda:db.session.query(Room), allow_blank=False)
+    # book is assigned in the view
+    # book = QuerySelectField(query_factory=Book.query.all, allow_blank=False)
 
 
 # BaseModelForm and ModelForm stuff is boilerplate
@@ -52,25 +61,34 @@ def add_books():
         db.session.commit()
 
         flash('Added ISBN#%s "%s"' % (add_book_form.isbn13.data, add_book_form.title.data), category='success')
-        return redirect((url_for('add_books')))
+        return redirect(url_for('add_books'))
     if add_book_form.is_submitted():
         flash('There was an error with your submission', category='error')
     return render_template('add_books.html', form=add_book_form)
 
 @app.route('/books')
 def books():
-    if 'isbn13' in request.args:
-        # you could also query by all possible args with Book.query.filter_by(**request.args)
-        bk = Book.query.filter_by(
-            isbn13=request.args.get('isbn13'),
-            inside_cover_id=request.args.get('inside_cover_id')
-        ).first_or_404()
+    # id overrides all other args
+    if 'id' in request.args:
+        bk = Book.query.get_or_404(request.args.get('id'))
         return render_template('single_book.html', book=bk)
+    elif request.args:
+        # If there are args that don't include id, filter by all of them
+        # TODO: make this more useful/robust, use fuzzy matching on title & description
+        return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
     return render_template('show_books.html', books=Book.query.all())
 
+@app.route('/checkout/<int:book_id>', methods=['GET','POST'])
+def checkout(book_id):
+    selected_book = Book.query.get_or_404(book_id)
+    checkout_form = CheckoutForm()
+    if checkout_form.validate_on_submit():
+        new_checkout = Checkout(checkout_date=checkout_form.checkout_date.data, book=selected_book, room=checkout_form.room.data)
 
-# # inside_cover_id is optional
-# @app.route('/books/<isbn>')
-# @app.route('/books/<isbn>&id=<inside_cover_id>')
-# def single_book(isbn=None, inside_cover_id=None):
-#     return 'GET not implemented!'
+        db.session.add(new_checkout)
+        db.session.commit()
+
+        flash('Checked out %s to Room %s' % (selected_book.title, checkout_form.room.data.id), category='success')
+        return redirect(url_for('books'))
+    # return render_template('checkout.html', book=bk, people=people, rooms=rooms)
+    return render_template('checkout.html', book=selected_book, form=checkout_form)

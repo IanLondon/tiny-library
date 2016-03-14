@@ -8,7 +8,7 @@ from sqlalchemy.sql import func
 
 from core.isbn import toI13
 from core.fetch_book_info import google_books_info
-from app import db
+from tinylibrary import db
 
 def normalize_url(url):
     """prepend 'http://' to url. Ensure there's no non-http(s) scheme."""
@@ -47,8 +47,8 @@ class Book(db.Model):
     )
 
     def __repr__(self):
-        return '<Book isbn13=%r, inside_cover_id=%r, date_added=%r, title=%r>' % (
-            self.isbn13, self.inside_cover_id, self.date_added, self.title)
+        return '<Book id=%s, isbn13=%r, inside_cover_id=%r, date_added=%s, title=%r>' % (
+            self.id, self.isbn13, self.inside_cover_id, self.date_added, self.title)
 
     def append_google_book_data(self):
         if not self.isbn13:
@@ -56,7 +56,7 @@ class Book(db.Model):
         google_data = google_books_info(self.isbn13)
         self.title = google_data['title']
         self.description = google_data['description']
-        self.thumbnail_url = google_data['imageLinks']['smallThumbnail']
+        self.thumbnail_url = google_data['imageLinks']['thumbnail']
 
         # allow chaining
         return self
@@ -80,6 +80,9 @@ class Room(db.Model):
     def __repr__(self):
         return '<Room id:%r name:%r>' % (self.id, self.name)
 
+    def __str__(self):
+        return '%s - %s' % (self.id, self.name)
+
 class Checkout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     checkout_date = db.Column(db.DateTime)
@@ -94,4 +97,4 @@ class Checkout(db.Model):
         backref=db.backref('checkouts', lazy='dynamic'))
 
     def __repr__(self):
-        return '<Checkout %r to %r from %r to %r>' % (self.book, self.room, self.checkout_date, self.return_date)
+        return '<Checkout Book ID=%r to room=%r from %s to %s>' % (self.book.id, self.room.id, self.checkout_date, self.return_date)

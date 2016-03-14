@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.datetimepicker.css') }}">
+{% endblock %}
+
+{% block title %}Checkout {{ book.title }}{% endblock %}
+{% block body %}
+<h1>Checkout <em>{{ book.title }}</em></h1>
+<div id=book>
+    <h2>Book info</h2>
+    <div id='title'>Title: {{ book.title }}</div>
+    <div id='isbn13'>ISBN13: {{ book.isbn13 }}</div>
+    <div id='inside_cover_id'>Custom ID: {{ book.inside_cover_id }}</div>
+    <img id="thumbnail_img" src="{{book.thumbnail_url}}">
+</div>
+
+<!-- TODO: make DRY with macro -->
+<form method="POST" action={{ url_for('checkout', book_id=book.id) }}>
+    <ul>{{ form.hidden_tag() }}
+    {% for field in form %}
+        {% if field.widget.input_type != 'hidden' %}
+            <li>{{ field.label }}
+        {% endif %}
+        {{ field }}
+        {% if field.errors %}
+            <ul class="errors">{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+        </li>{% endif %}
+    {% endfor %}</ul>
+    <input type="submit" value="+">
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/jquerydatetimepicker/jquery.datetimepicker.full.min.js') }}"></script>
+<script>
+$('input#checkout_date').datetimepicker();
+</script>
+{% endblock %}

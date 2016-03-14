@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
+{% from 'flash_macros.html' import simple_flash %}
+
 {% block title %}All the books{% endblock %}
 {% block body %}
+{{ simple_flash() }}
 <table>
     <tr>
         <th>Title</th>
@@ -12,7 +15,7 @@
     </tr>
     {% for book in books %}
     <tr>
-        <td><a href="{{ url_for('books', isbn13=book.isbn13, inside_cover_id=book.inside_cover_id)}}">{{ book.title }}</a></td>
+        <td><a href="{{ url_for('books', id=book.id)}}">{{ book.title }}</a></td>
         <td>{{ book.isbn13 }}</td>
         <td>{{ book.inside_cover_id }}</td>
         <td>{{ book.description }}</td>
