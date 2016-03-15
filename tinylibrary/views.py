@@ -53,7 +53,7 @@ class CheckoutForm(Form):
 # Views #
 #########
 
-@tinylibrary_app.route('/add_books', methods=['GET','POST'])
+@tinylibrary_app.route('/add_books/', methods=['GET','POST'])
 def add_books():
     add_book_form = AddBookForm()
     if add_book_form.validate_on_submit():
