@@ -86,7 +86,7 @@ class Room(db.Model):
 
 class Checkout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    checkout_date = db.Column(db.DateTime)
+    checkout_date = db.Column(db.DateTime, nullable=False, default=func.now())
     return_date = db.Column(db.DateTime)
 
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))

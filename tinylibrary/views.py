@@ -79,8 +79,15 @@ def books():
     elif request.args:
         # If there are args that don't include id, filter by all of them
         # TODO: make this more useful/robust, use fuzzy matching on title & description
+
         return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
-    return render_template('show_books.html', books=Book.query.all())
+
+    # No args
+    books = Book.query.join(Checkout).all()
+    # available_books = Book.query.join(Checkout.book_id).filter(Checkout.return_date != None).all()
+    print books
+    return render_template('show_books.html', books=books)
+    # return render_template('show_books.html', books=Book.query.all())
 
 @tinylibrary_app.route('/checkout/<int:book_id>', methods=['GET','POST'])
 def checkout(book_id):

@@ -7,6 +7,7 @@ from models import Book, Room, Checkout
 
 import urlparse
 import os
+from datetime import datetime
 
 TINYLIBRARY_SQLITE3_PATH = '/tmp/tinylibrary.db'
 
@@ -25,19 +26,20 @@ def init_db(app):
     print 'created tables'
 
 def populate_db(app):
-    book1 = Book(isbn13='7796594424423', inside_cover_id='A')
-    book2 = Book(isbn13='9781491946008') # Fluent Python book
-    book2.append_google_book_data()
+    book1 = Book(isbn13='7796594424423', title='foo', inside_cover_id='A')
+    book2 = Book(isbn13='9781491946008', title='fluent python') # Fluent Python book
+    # book2.append_google_book_data() # too slow sometimes...
 
     room1 = Room(id='1', name='Ms Foo')
     room2 = Room(id='2', name='Mr Spam')
 
-    co1 = Checkout(book=book1, room=room1)
+    co1 = Checkout(book=book1, room=room1, return_date=datetime.now())
     co2 = Checkout(book=book2, room=room2)
 
     with app.app_context():
         for rec in (book1, book2, room1, room2, co1, co2):
             db.session.add(rec)
+            print rec, 'added'
 
         db.session.commit()
     print 'added some data'

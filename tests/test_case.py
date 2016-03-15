@@ -73,6 +73,8 @@ class DumbTest(TestCase):
         db.session.add(b2)
         db.session.commit()
 
+        assert( len(Book.query.all()) == 2)
+
     def test_book_isbn10(self):
         b = Book(isbn13=randIsbn10())
         db.session.add(b)
