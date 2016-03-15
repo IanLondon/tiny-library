@@ -1,4 +1,4 @@
-# Run with `python -m pytest -v tests` from parent directory
+# Run with `python -m pytest -v tests` or `py.test -v tests' from parent directory
 from flask import Flask, url_for
 import unittest
 from flask.ext.testing import TestCase
@@ -18,6 +18,7 @@ from sqlalchemy.exc import IntegrityError
 from tinylibrary.models import Book, Room, Checkout
 from tinylibrary.core.isbn import InvalidIsbn, randIsbn10, randIsbn13
 from tinylibrary.app import create_app
+from tinylibrary.views import tinylibrary_app
 from tinylibrary.database import db
 
 class DumbTest(TestCase):
@@ -26,8 +27,11 @@ class DumbTest(TestCase):
     TESTING = True
 
     def create_app(self):
-        app = create_app()
-        # db = SQLAlchemy(app)
+        # app = create_app()
+        app = Flask(__name__)
+        db.init_app(app)
+        app.register_blueprint(tinylibrary_app)
+
         return app
 
     def setUp(self):
