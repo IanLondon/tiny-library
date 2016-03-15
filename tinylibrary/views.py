@@ -1,15 +1,19 @@
+from database import db
+
 from flask import render_template, request, redirect, url_for, flash
+from flask.blueprints import Blueprint
 from flask_wtf import Form
 from wtforms.fields.html5 import URLField, DateTimeField
 from wtforms import StringField, HiddenField, validators
 from datetime import datetime
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-# from wtforms_alchemy import model_form_factory
-
-from tinylibrary.models import Book, Room, Checkout
-from tinylibrary import app, db
+from models import Book, Room, Checkout
 from validators import ValidateIsbn
+
+tinylibrary_app = Blueprint('tinylibrary_app', __name__,
+    template_folder='templates', static_folder='static')
+
 
 #########
 # Forms #
@@ -49,7 +53,7 @@ class CheckoutForm(Form):
 # Views #
 #########
 
-@app.route('/add_books', methods=['GET','POST'])
+@tinylibrary_app.route('/add_books', methods=['GET','POST'])
 def add_books():
     add_book_form = AddBookForm()
     if add_book_form.validate_on_submit():
@@ -66,7 +70,7 @@ def add_books():
         flash('There was an error with your submission', category='error')
     return render_template('add_books.html', form=add_book_form)
 
-@app.route('/books')
+@tinylibrary_app.route('/books/')
 def books():
     # id overrides all other args
     if 'id' in request.args:
@@ -78,7 +82,7 @@ def books():
         return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
     return render_template('show_books.html', books=Book.query.all())
 
-@app.route('/checkout/<int:book_id>', methods=['GET','POST'])
+@tinylibrary_app.route('/checkout/<int:book_id>', methods=['GET','POST'])
 def checkout(book_id):
     selected_book = Book.query.get_or_404(book_id)
     checkout_form = CheckoutForm()

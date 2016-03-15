@@ -2,12 +2,15 @@
 from flask import Flask, url_for
 import unittest
 from flask.ext.testing import TestCase
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
 
-from app import db
-from models import *
-import views
-from core.isbn import InvalidIsbn, randIsbn10, randIsbn13
+# from app import db
+# from models import *
+# import views
+
+from tinylibrary.models import Book, Room, Checkout, db
+from tinylibrary.core.isbn import InvalidIsbn, randIsbn10, randIsbn13
 
 class DumbTest(TestCase):
 
@@ -16,6 +19,7 @@ class DumbTest(TestCase):
 
     def create_app(self):
         app = Flask(__name__)
+        # db = SQLAlchemy(app)
         return app
 
     def setUp(self):

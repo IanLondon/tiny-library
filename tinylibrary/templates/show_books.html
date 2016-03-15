@@ -15,7 +15,7 @@
     </tr>
     {% for book in books %}
     <tr>
-        <td><a href="{{ url_for('books', id=book.id)}}">{{ book.title }}</a></td>
+        <td><a href="{{ url_for('.books', id=book.id)}}">{{ book.title }}</a></td>
         <td>{{ book.isbn13 }}</td>
         <td>{{ book.inside_cover_id }}</td>
         <td>{{ book.description }}</td>

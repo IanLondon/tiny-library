@@ -1,3 +1,5 @@
+from database import db
+
 from urlparse import urlparse
 from os.path import splitext, basename
 from datetime import datetime
@@ -8,7 +10,6 @@ from sqlalchemy.sql import func
 
 from core.isbn import toI13
 from core.fetch_book_info import google_books_info
-from tinylibrary import db
 
 def normalize_url(url):
     """prepend 'http://' to url. Ensure there's no non-http(s) scheme."""
