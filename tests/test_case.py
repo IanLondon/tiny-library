@@ -1,4 +1,4 @@
-# Run with `python -m unittest -v test_case` for verbose output
+# Run with `python -m pytest -v tests` from parent directory
 from flask import Flask, url_for
 import unittest
 from flask.ext.testing import TestCase
@@ -9,8 +9,16 @@ from sqlalchemy.exc import IntegrityError
 # from models import *
 # import views
 
-from tinylibrary.models import Book, Room, Checkout, db
+# project root is in parent directory
+# import os
+# import sys
+# topdir = os.path.join(os.path.dirname(__file__), "..")
+# sys.path.append(topdir)
+
+from tinylibrary.models import Book, Room, Checkout
 from tinylibrary.core.isbn import InvalidIsbn, randIsbn10, randIsbn13
+from tinylibrary.app import create_app
+from tinylibrary.database import db
 
 class DumbTest(TestCase):
 
@@ -18,7 +26,7 @@ class DumbTest(TestCase):
     TESTING = True
 
     def create_app(self):
-        app = Flask(__name__)
+        app = create_app()
         # db = SQLAlchemy(app)
         return app
 
@@ -42,8 +50,8 @@ class DumbTest(TestCase):
         same_isbn = randIsbn13()
         same_inner_cover = 'ABC'
 
-        b1 = Book(same_isbn, same_inner_cover)
-        b2 = Book(same_isbn, same_inner_cover)
+        b1 = Book(isbn13=same_isbn, inside_cover_id=same_inner_cover)
+        b2 = Book(isbn13=same_isbn, inside_cover_id=same_inner_cover)
 
         db.session.add(b1)
         db.session.add(b2)
@@ -54,27 +62,20 @@ class DumbTest(TestCase):
 
         same_isbn = randIsbn13()
 
-        b1 = Book(same_isbn, '1')
-        b2 = Book(same_isbn, '2')
+        b1 = Book(isbn13=same_isbn, inside_cover_id='1')
+        b2 = Book(isbn13=same_isbn, inside_cover_id='2')
 
         db.session.add(b1)
         db.session.add(b2)
         db.session.commit()
 
     def test_book_isbn10(self):
-        b = Book(randIsbn10())
+        b = Book(isbn13=randIsbn10())
         db.session.add(b)
         db.session.commit()
 
     def test_book_isbn_validation(self):
-        self.assertRaises(InvalidIsbn, Book, '123')
-
-    def test_books_info_scraping(self):
-        hunger_games_isbn = '9780545586177'
-        b = Book(hunger_games_isbn)
-        db.session.add(b)
-        db.session.commit()
-        print "IsbnCache:", IsbnCache.query.all()
+        self.assertRaises(InvalidIsbn, Book, isbn13='123')
 
 if __name__ == '__main__':
     unittest.main()
