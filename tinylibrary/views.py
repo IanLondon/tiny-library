@@ -65,7 +65,7 @@ def add_books():
         db.session.commit()
 
         flash('Added ISBN#%s "%s"' % (add_book_form.isbn13.data, add_book_form.title.data), category='success')
-        return redirect(url_for('add_books'))
+        return redirect(url_for('.add_books'))
     if add_book_form.is_submitted():
         flash('There was an error with your submission', category='error')
     return render_template('add_books.html', form=add_book_form)
@@ -93,6 +93,6 @@ def checkout(book_id):
         db.session.commit()
 
         flash('Checked out %s to Room %s' % (selected_book.title, checkout_form.room.data.id), category='success')
-        return redirect(url_for('books'))
+        return redirect(url_for('.books'))
     # return render_template('checkout.html', book=bk, people=people, rooms=rooms)
     return render_template('checkout.html', book=selected_book, form=checkout_form)
