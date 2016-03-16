@@ -3,17 +3,22 @@ from database import db, login_manager
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask.blueprints import Blueprint
 from flask_wtf import Form
-from wtforms.fields.html5 import URLField, DateTimeField
-from wtforms import StringField, HiddenField, validators
-from datetime import datetime
+from wtforms.fields.html5 import URLField, DateTimeField, EmailField
+from wtforms import StringField, HiddenField, PasswordField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from flask.ext.login import login_user, logout_user, current_user, login_required
+
+from datetime import datetime
 
 from models import Book, Room, Checkout, Person, Admin
 from validators import ValidateIsbn
 
+
+
 tinylibrary_app = Blueprint('tinylibrary_app', __name__,
     template_folder='templates', static_folder='static')
 
+login_manager.login_view = 'tinylibrary_app.login'
 
 #########
 # Forms #
@@ -35,6 +40,9 @@ class CheckoutForm(Form):
 class ReturnForm(Form):
     return_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
 
+class LoginForm(Form):
+    username = EmailField('Username (Email address)', [validators.DataRequired(), validators.Email()])
+    password = PasswordField(validators=[validators.DataRequired()])
 
 #########
 # Views #
@@ -119,6 +127,27 @@ def students_bulk_add():
         # return the URL for json redirect
         return jsonify({'redirect':url_for('.books')})
     return render_template('add_students_csv.html')
+
+@tinylibrary_app.route('/login', methods=['GET','POST'])
+def login():
+    login_form = LoginForm()
+    if login_form.validate_on_submit():
+        registered_user = Admin.query.filter_by(username=login_form.username.data).first()
+        if registered_user and registered_user.is_correct_password(login_form.password.data):
+            login_user(registered_user, remember=True)
+            flash('Logged in successfully. Hello %s!' % (registered_user.username), category='success')
+            return redirect(url_for('tinylibrary_app.books'))
+        flash('Username or Password is invalid' , 'error')
+    return render_template('login.html', form=login_form)
+
+@tinylibrary_app.route('/logout')
+def logout():
+    if current_user.is_authenticated:
+        flash('Logged out %s.' % current_user.username, category='success')
+        logout_user()
+    else:
+        flash('Already logged out.', category='error')
+    return redirect(url_for('tinylibrary_app.books'))
 
 @login_manager.user_loader
 def load_user(admin_id):

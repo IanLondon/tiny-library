@@ -1,4 +1,4 @@
-from database import db, login_manager
+from database import db, login_manager, bcrypt
 from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 # from views import add_books, books, checkout
@@ -21,6 +21,8 @@ def create_app():
 
     login_manager.init_app(app)
     login_manager.login_view = 'login'
+
+    bcrypt.init_app(app)
 
     app.register_blueprint(tinylibrary_app)
     return app

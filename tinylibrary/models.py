@@ -1,4 +1,4 @@
-from database import db
+from database import db, bcrypt
 
 from urlparse import urlparse
 from os.path import splitext, basename
@@ -7,6 +7,9 @@ from datetime import datetime
 from sqlalchemy import event
 from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from flask.ext.login import UserMixin
 
 from core.isbn import toI13
 from core.fetch_book_info import google_books_info
@@ -144,25 +147,35 @@ class Person(db.Model):
     def __str__(self):
         return '%s, %s %s (%s)' % (self.last_name, self.first_name, self.middle_name, self.id)
 
-class Admin(db.Model):
+class Admin(db.Model, UserMixin):
     id = db.Column(db.Integer , primary_key=True)
-    username = db.Column(db.String(20), unique=True)
-    password = db.Column(db.String(20))
-    email = db.Column(db.String(50))
+    username = db.Column(db.String(50), unique=True) #Should be an email
+    _password = db.Column(db.String(20))
 
     date_added = db.Column(db.DateTime, default=func.now())
 
-    def is_authenticated(self):
-        return True
+    # def is_authenticated(self):
+    #     return True
+    #
+    # def is_active(self):
+    #     return True
+    #
+    # def is_anonymous(self):
+    #     return False
+    #
+    # def get_id(self):
+    #     return unicode(self.id)
 
-    def is_active(self):
-        return True
+    @hybrid_property
+    def password(self):
+        return self._password
 
-    def is_anonymous(self):
-        return False
+    @password.setter
+    def _set_password(self, plaintext):
+        self._password = bcrypt.generate_password_hash(plaintext)
 
-    def get_id(self):
-        return unicode(self.id)
+    def is_correct_password(self, plaintext):
+        return bcrypt.check_password_hash(self._password, plaintext)
 
     def __repr__(self):
         return '<Admin ID=%s, username=%s>' % (self.id, self.username)
