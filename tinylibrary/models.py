@@ -62,6 +62,9 @@ class Book(db.Model):
         # allow chaining
         return self
 
+    def is_available(self):
+        return self.checkout.filter(Checkout.return_date.isnot(None)).scalar()
+
     @validates('isbn13')
     def validate_isbn(self, key, isbn_raw):
         """Convert to stripped ISBN13, validating in the process"""
@@ -91,11 +94,15 @@ class Checkout(db.Model):
 
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     book = db.relationship('Book',
-        backref=db.backref('checkouts', lazy='dynamic'))
+        backref=db.backref('checkout', lazy='dynamic'))
 
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'))
     room = db.relationship('Room',
-        backref=db.backref('checkouts', lazy='dynamic'))
+        backref=db.backref('checkout', lazy='dynamic'))
+
+    __table_args__ = (
+        db.UniqueConstraint('book_id', 'checkout_date', name='_one_checkout_at_a_time'),
+    )
 
     def __repr__(self):
         return '<Checkout Book ID=%r to room=%r from %s to %s>' % (self.book.id, self.room.id, self.checkout_date, self.return_date)

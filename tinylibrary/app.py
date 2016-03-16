@@ -39,7 +39,7 @@ def populate_db(app):
     with app.app_context():
         for rec in (book1, book2, room1, room2, co1, co2):
             db.session.add(rec)
-            print rec, 'added'
+            print repr(rec), 'added'
 
         db.session.commit()
     print 'added some data'

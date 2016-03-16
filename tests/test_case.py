@@ -21,7 +21,19 @@ from tinylibrary.app import create_app
 from tinylibrary.views import tinylibrary_app
 from tinylibrary.database import db
 
-class DumbTest(TestCase):
+def make_checkout(commit=False):
+    bk = Book(isbn13=randIsbn13())
+    rm = Room(name='Foo')
+    # If checkout_date is null in the constructor,
+    # a default value will get added by SQL database
+    chk = Checkout(book=bk, room=rm)
+    if commit:
+        for obj in (bk, rm, chk):
+            db.session.add(obj)
+        db.session.commit()
+    return bk, rm, chk
+
+class ConstraintsTest(TestCase):
 
     SQLALCHEMY_DATABASE_URI = 'sqlite://' #this is the same as :memory:
     TESTING = True
@@ -82,6 +94,22 @@ class DumbTest(TestCase):
 
     def test_book_isbn_validation(self):
         self.assertRaises(InvalidIsbn, Book, isbn13='123')
+
+    def test_checkout_date_null(self):
+        make_checkout(commit=True)
+
+        # Now try to give the Checkout object a null checkout_date
+        chk_sess = Checkout.query.get(1)
+        chk_sess.checkout_date = None
+        db.session.add(chk_sess)
+        self.assertRaises(IntegrityError, db.session.commit)
+
+    def test_checkout_one_at_a_time(self):
+        """Test the UniqueConstraint"""
+        bk, rm, chk = make_checkout(commit=True)
+        chk2 = Checkout(book=bk, room=rm)
+        db.session.add(chk2)
+        self.assertRaises(IntegrityError, db.session.commit)
 
 if __name__ == '__main__':
     unittest.main()
