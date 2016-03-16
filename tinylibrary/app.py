@@ -3,7 +3,7 @@ from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 # from views import add_books, books, checkout
 from views import tinylibrary_app
-from models import Book, Room, Checkout
+from models import Book, Room, Checkout, Person
 
 import urlparse
 import os
@@ -33,11 +33,15 @@ def populate_db(app):
     room1 = Room(id='1', name='Ms Foo')
     room2 = Room(id='2', name='Mr Spam')
 
-    co1 = Checkout(book=book1, room=room1, return_date=datetime.now())
-    co2 = Checkout(book=book2, room=room2)
+    alice = Person(first_name='Alice', middle_name='X', last_name='Aaronson')
+    bob = Person(first_name='Bob', last_name='Bobberson')
+    inactive_student = Person(first_name='Inactive', last_name='Student', active=False)
+
+    co1 = Checkout(book=book1, room=room1, person=alice, return_date=datetime.now())
+    co2 = Checkout(book=book2, room=room2, person=bob)
 
     with app.app_context():
-        for rec in (book1, book2, room1, room2, co1, co2):
+        for rec in (book1, book2, room1, room2, alice, bob, inactive_student, co1, co2):
             db.session.add(rec)
             print repr(rec), 'added'
 

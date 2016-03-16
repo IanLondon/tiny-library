@@ -116,9 +116,30 @@ class Checkout(db.Model):
     room = db.relationship('Room',
         backref=db.backref('checkout', lazy='dynamic'))
 
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+    person = db.relationship('Person',
+        backref=db.backref('chekout', lazy='dynamic'))
+
     __table_args__ = (
         db.UniqueConstraint('book_id', 'checkout_date', name='_one_checkout_at_a_time'),
     )
 
     def __repr__(self):
         return '<Checkout Book ID=%r to room=%r from %s to %s>' % (self.book.id, self.room.id, self.checkout_date, self.return_date)
+
+class Person(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    first_name = db.Column(db.String(60))
+    middle_name = db.Column(db.String(60), nullable=True)
+    last_name = db.Column(db.String(60))
+
+    active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    date_added = db.Column(db.DateTime, default=func.now())
+
+    def __repr__(self):
+        return '<Person ID=%s, %s %s %s>' % (self.id, self.first_name, self.middle_name, self.last_name)
+
+    def __str__(self):
+        return '%s, %s %s (%s)' % (self.last_name, self.first_name, self.middle_name, self.id)

@@ -8,7 +8,7 @@ from wtforms import StringField, HiddenField, validators
 from datetime import datetime
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-from models import Book, Room, Checkout
+from models import Book, Room, Checkout, Person
 from validators import ValidateIsbn
 
 tinylibrary_app = Blueprint('tinylibrary_app', __name__,
@@ -29,6 +29,7 @@ class AddBookForm(Form):
 class CheckoutForm(Form):
     checkout_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
     room = QuerySelectField(query_factory=lambda:db.session.query(Room), allow_blank=False)
+    person = QuerySelectField(query_factory=lambda:db.session.query(Person).filter(Person.active), allow_blank=False)
     # book is assigned in the view
 
 class ReturnForm(Form):
@@ -80,7 +81,7 @@ def checkout(book_id):
 
     checkout_form = CheckoutForm()
     if checkout_form.validate_on_submit():
-        new_checkout = Checkout(checkout_date=checkout_form.checkout_date.data, book=selected_book, room=checkout_form.room.data)
+        new_checkout = Checkout(checkout_date=checkout_form.checkout_date.data, book=selected_book, person=checkout_form.person.data, room=checkout_form.room.data)
 
         db.session.add(new_checkout)
         db.session.commit()
