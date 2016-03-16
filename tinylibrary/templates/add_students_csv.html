@@ -12,6 +12,8 @@
 <script>
     function parse_csv(callback) {
         var input = $('#csv_text').val();
+        // XXX: hack for tab-delimited input
+        input = input.replace(/\t/g,',');
         try {
             var data = $.csv.toObjects(input);
         } catch(e) {
