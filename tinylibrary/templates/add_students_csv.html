@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% from 'flash_macros.html' import simple_flash %}
+{% block title %}Bulk-add students to database{% endblock %}
+{% block body %}
+{{ simple_flash() }}
+<textarea id='csv_text' style='height:200px;' default='Paste comma-separated data here'></textarea>
+<button id="parse_button">Enter</button>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('.static', filename='js/jquery.csv.min.js') }}"></script>
+<script>
+    function parse_csv(callback) {
+        var input = $('#csv_text').val();
+        try {
+            var data = $.csv.toObjects(input);
+        } catch(e) {
+            alert('Error: text is not valid CSV. (' + e + ')');
+            return e;
+        }
+        callback(data);
+    }
+
+    function post_data(data) {
+        json_data = JSON.stringify(data);
+        $.ajax({
+            url:'{{ url_for('.students_bulk_add')}}',
+            type:'POST',
+            data:json_data,
+            contentType: "application/json; charset=utf-8",
+            dataType:"json",
+            success: function(response){
+            if (response.redirect !== undefined && response.redirect) {
+                window.location.href = response.redirect;
+            } else {
+                console.warn('Invalid response from server: ', response);
+            }
+        }});
+    }
+
+    $('#parse_button').click(function(){parse_csv(post_data);})
+</script>
+{% endblock %}

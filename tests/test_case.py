@@ -15,7 +15,7 @@ from sqlalchemy.exc import IntegrityError
 # topdir = os.path.join(os.path.dirname(__file__), "..")
 # sys.path.append(topdir)
 
-from tinylibrary.models import Book, Room, Checkout
+from tinylibrary.models import Book, Room, Checkout, Person, Admin
 from tinylibrary.core.isbn import InvalidIsbn, randIsbn10, randIsbn13
 from tinylibrary.app import create_app
 from tinylibrary.views import tinylibrary_app

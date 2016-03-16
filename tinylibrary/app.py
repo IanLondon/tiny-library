@@ -1,4 +1,4 @@
-from database import db
+from database import db, login_manager
 from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 # from views import add_books, books, checkout
@@ -16,7 +16,12 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + TINYLIBRARY_SQLITE3_PATH
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True #XXX:???
     app.config.from_pyfile('secrets.py')
+
     db.init_app(app)
+
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
+
     app.register_blueprint(tinylibrary_app)
     return app
 

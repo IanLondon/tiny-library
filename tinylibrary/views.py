@@ -1,6 +1,6 @@
-from database import db
+from database import db, login_manager
 
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask.blueprints import Blueprint
 from flask_wtf import Form
 from wtforms.fields.html5 import URLField, DateTimeField
@@ -8,7 +8,7 @@ from wtforms import StringField, HiddenField, validators
 from datetime import datetime
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-from models import Book, Room, Checkout, Person
+from models import Book, Room, Checkout, Person, Admin
 from validators import ValidateIsbn
 
 tinylibrary_app = Blueprint('tinylibrary_app', __name__,
@@ -106,3 +106,20 @@ def return_book(book_id):
         flash('Returned %s (ID: %s)' % (selected_book.title, selected_book.inside_cover_id), category='success')
         return redirect(url_for('.books'))
     return render_template('return_book.html', book=selected_book, form=return_form)
+
+@tinylibrary_app.route('/add_students/', methods=['GET','POST'])
+def students_bulk_add():
+    if request.method == 'POST':
+        # should get JSON data from AJAX request
+        data = request.get_json()
+        print 'got bulk student data:', data
+        # TODO: persist the data
+        print 'TODO: add student data to database'
+        flash('Added students', category='success')
+        # return the URL for json redirect
+        return jsonify({'redirect':url_for('.books')})
+    return render_template('add_students_csv.html')
+
+@login_manager.user_loader
+def load_user(admin_id):
+    return Admin.query.get(admin_id)

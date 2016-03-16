@@ -1,6 +1,6 @@
 from tinylibrary.database import db
 from tinylibrary.app import create_app
-from tinylibrary.models import Book, Room, Checkout, Person
+from tinylibrary.models import Book, Room, Checkout, Person, Admin
 
 from sqlalchemy.sql import func
 
