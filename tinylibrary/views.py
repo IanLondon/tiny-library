@@ -33,6 +33,9 @@ class CheckoutForm(Form):
     # book is assigned in the view
     # book = QuerySelectField(query_factory=Book.query.all, allow_blank=False)
 
+class ReturnForm(Form):
+    return_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
+
 
 # BaseModelForm and ModelForm stuff is boilerplate
 # for using flask-wtf + wtforms_alchemy together
@@ -83,15 +86,15 @@ def books():
         return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
 
     # No args
-    books = Book.query.join(Checkout).all()
-    # available_books = Book.query.join(Checkout.book_id).filter(Checkout.return_date != None).all()
-    print books
-    return render_template('show_books.html', books=books)
-    # return render_template('show_books.html', books=Book.query.all())
+    return render_template('show_books.html', books=Book.query.all())
 
 @tinylibrary_app.route('/checkout/<int:book_id>', methods=['GET','POST'])
 def checkout(book_id):
     selected_book = Book.query.get_or_404(book_id)
+    if not selected_book.is_available():
+        flash('"%s" (ID: %s) is already checked out. It must be returned before you can check it out.' % (selected_book.title, selected_book.inside_cover_id), category='error')
+        return redirect(url_for('.books'))
+
     checkout_form = CheckoutForm()
     if checkout_form.validate_on_submit():
         new_checkout = Checkout(checkout_date=checkout_form.checkout_date.data, book=selected_book, room=checkout_form.room.data)
@@ -103,3 +106,19 @@ def checkout(book_id):
         return redirect(url_for('.books'))
     # return render_template('checkout.html', book=bk, people=people, rooms=rooms)
     return render_template('checkout.html', book=selected_book, form=checkout_form)
+
+@tinylibrary_app.route('/return/<int:book_id>', methods=['GET','POST'])
+def return_book(book_id):
+    selected_book = Book.query.get_or_404(book_id)
+    if selected_book.is_available():
+        flash('"%s" (ID: %s) is not checked out. It cannot be returned.' % (selected_book.title, selected_book.inside_cover_id), category='error')
+        return redirect(url_for('.books'))
+    return_form = ReturnForm()
+    if return_form.validate_on_submit():
+        open_checkout = selected_book.open_checkout()
+        open_checkout.return_date = return_form.return_date.data
+        db.session.add(open_checkout)
+        db.session.commit()
+        flash('Returned %s (ID: %s)' % (selected_book.title, selected_book.inside_cover_id), category='success')
+        return redirect(url_for('.books'))
+    return render_template('return_book.html', book=selected_book, form=return_form)

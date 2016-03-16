@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% from 'form_macros.html' import form_uls %}
+{% block title %}Return {{ book.title }}{% endblock %}
+{% block body %}
+<h1>Return {{ book.title }}</h1>
+<div>{% if book.thumbnail_url %}<img src="{{ book.thumbnail_url }}">{% endif %}</div>
+<form method="POST" action={{ url_for('.return_book', book_id=book.id) }}>
+    {{ form_uls(form) }}
+    <input type="submit" value="Return">
+</form>
+
+{% endblock %}

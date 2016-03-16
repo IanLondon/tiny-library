@@ -2,6 +2,13 @@
 {% block title %}{{ book.title }}{% endblock %}
 {% block body %}
 <div id='title'>Title: {{ book.title }}</div>
+<div id='availability'>
+    {% if not book.is_available() %}
+        Not available. Last checked out {{ book.last_checked_out() }}. <a href="{{ url_for('.return_book', book_id=book.id)}}">RETURN</a>
+    {% else %}
+        <a href="{{ url_for('.checkout', book_id=book.id)}}">AVAILABLE</a>
+    {% endif %}
+</div>
 <div id='isbn13'>ISBN13: {{ book.isbn13 }}</div>
 <div id='inside_cover_id'>Custom ID: {{ book.inside_cover_id }}</div>
 <div id='description'>Description: {{ book.description }}</div>

@@ -63,7 +63,23 @@ class Book(db.Model):
         return self
 
     def is_available(self):
-        return self.checkout.filter(Checkout.return_date.isnot(None)).scalar()
+        """True if available, ie true if not currently checked out. False otherwise."""
+        return self.checkout.filter(Checkout.return_date == None).count() == 0
+
+    def open_checkout(self):
+        """Returns the open Checkout for this book, or None if there's no open checkouts."""
+        return self.checkout.filter(Checkout.return_date == None).scalar()
+
+    def last_checked_out(self):
+        """Date last checked out, or None if never checked out.
+        Doesn't tell you anything about whether it's available or not."""
+        return db.session.query(func.max(Checkout.checkout_date)).filter_by(book_id=self.id).scalar()
+
+    def teaser(self, chars=120):
+        """Teaser text for description"""
+        # TODO: this should probably be a macro or something, it's not specific to this text field only
+        if self.description:
+            return self.description[:chars]
 
     @validates('isbn13')
     def validate_isbn(self, key, isbn_raw):
