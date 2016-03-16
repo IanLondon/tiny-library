@@ -143,3 +143,14 @@ class Person(db.Model):
 
     def __str__(self):
         return '%s, %s %s (%s)' % (self.last_name, self.first_name, self.middle_name, self.id)
+
+class Admin(db.Model):
+    id = db.Column(db.Integer , primary_key=True)
+    username = db.Column(db.String(20), unique=True , index=True)
+    password = db.Column(db.String(20))
+    email = db.Column(db.String(50),unique=True , index=True)
+
+    date_added = db.Column(db.DateTime, default=func.now())
+
+    def __repr__(self):
+        return '<Admin ID=%s, username=%s>' % (self.id, self.username)
