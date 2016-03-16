@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% from 'form_macros.html' import form_uls %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('.static', filename='css/jquery.datetimepicker.css') }}">
+{% endblock %}
+
 {% block title %}Return {{ book.title }}{% endblock %}
 {% block body %}
 <h1>Return {{ book.title }}</h1>
@@ -9,4 +14,12 @@
     <input type="submit" value="Return">
 </form>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('.static', filename='js/jquerydatetimepicker/jquery.datetimepicker.full.min.js') }}"></script>
+<script>
+$('input#return_date').datetimepicker();
+</script>
 {% endblock %}

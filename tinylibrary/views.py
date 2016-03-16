@@ -28,28 +28,11 @@ class AddBookForm(Form):
 
 class CheckoutForm(Form):
     checkout_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
-    # room = QuerySelectField(query_factory=Room.query.all, allow_blank=False)
     room = QuerySelectField(query_factory=lambda:db.session.query(Room), allow_blank=False)
     # book is assigned in the view
-    # book = QuerySelectField(query_factory=Book.query.all, allow_blank=False)
 
 class ReturnForm(Form):
     return_date = DateTimeField(format='%Y/%m/%d %H:%M',validators=[validators.DataRequired()], default=datetime.today())
-
-
-# BaseModelForm and ModelForm stuff is boilerplate
-# for using flask-wtf + wtforms_alchemy together
-
-# BaseModelForm = model_form_factory(Form)
-#
-# class ModelForm(BaseModelForm):
-#     @classmethod
-#     def get_session(self):
-#         return db.session
-#
-# class AddBookForm(ModelForm):
-#     class Meta:
-#         model = Book
 
 
 #########
