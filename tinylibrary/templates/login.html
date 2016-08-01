@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% from 'flash_macros.html' import simple_flash %}
+{% from 'form_macros.html' import form_uls %}
+{% block title %}Admin Login{% endblock %}
+{% block body %}
+{{ simple_flash() }}
+<h1>Admin Login</h1>
+<form method="POST" action={{ url_for('.login') }}>
+    {{ form_uls(form) }}
+    <input type="submit" value="Login">
+</form>
+{% endblock %}

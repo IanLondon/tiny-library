@@ -14,11 +14,8 @@ from models import Book, Room, Checkout, Person, Admin
 from validators import ValidateIsbn
 
 
-
 tinylibrary_app = Blueprint('tinylibrary_app', __name__,
     template_folder='templates', static_folder='static')
-
-login_manager.login_view = 'tinylibrary_app.login'
 
 #########
 # Forms #
@@ -49,6 +46,7 @@ class LoginForm(Form):
 #########
 
 @tinylibrary_app.route('/add_books/', methods=['GET','POST'])
+@login_required
 def add_books():
     add_book_form = AddBookForm()
     if add_book_form.validate_on_submit():
@@ -65,22 +63,8 @@ def add_books():
         flash('There was an error with your submission', category='error')
     return render_template('add_books.html', form=add_book_form)
 
-@tinylibrary_app.route('/books/')
-def books():
-    # id overrides all other args
-    if 'id' in request.args:
-        bk = Book.query.get_or_404(request.args.get('id'))
-        return render_template('single_book.html', book=bk)
-    elif request.args:
-        # If there are args that don't include id, filter by all of them
-        # TODO: make this more useful/robust, use fuzzy matching on title & description
-
-        return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
-
-    # No args
-    return render_template('show_books.html', books=Book.query.all())
-
 @tinylibrary_app.route('/checkout/<int:book_id>', methods=['GET','POST'])
+@login_required
 def checkout(book_id):
     selected_book = Book.query.get_or_404(book_id)
     if not selected_book.is_available():
@@ -100,6 +84,7 @@ def checkout(book_id):
     return render_template('checkout.html', book=selected_book, form=checkout_form)
 
 @tinylibrary_app.route('/return/<int:book_id>', methods=['GET','POST'])
+@login_required
 def return_book(book_id):
     selected_book = Book.query.get_or_404(book_id)
     if selected_book.is_available():
@@ -116,6 +101,7 @@ def return_book(book_id):
     return render_template('return_book.html', book=selected_book, form=return_form)
 
 @tinylibrary_app.route('/add_students/', methods=['GET','POST'])
+@login_required
 def students_bulk_add():
     if request.method == 'POST':
         # should get JSON data from AJAX request
@@ -127,6 +113,23 @@ def students_bulk_add():
         # return the URL for json redirect
         return jsonify({'redirect':url_for('.books')})
     return render_template('add_students_csv.html')
+
+# Public views
+
+@tinylibrary_app.route('/books/')
+def books():
+    # id overrides all other args
+    if 'id' in request.args:
+        bk = Book.query.get_or_404(request.args.get('id'))
+        return render_template('single_book.html', book=bk)
+    elif request.args:
+        # If there are args that don't include id, filter by all of them
+        # TODO: make this more useful/robust, use fuzzy matching on title & description
+
+        return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
+
+    # No args
+    return render_template('show_books.html', books=Book.query.all())
 
 @tinylibrary_app.route('/login', methods=['GET','POST'])
 def login():

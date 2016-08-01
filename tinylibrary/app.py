@@ -3,7 +3,7 @@ from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 # from views import add_books, books, checkout
 from views import tinylibrary_app
-from models import Book, Room, Checkout, Person
+from models import Book, Room, Checkout, Person, Admin
 
 import urlparse
 import os
@@ -19,8 +19,8 @@ def create_app():
 
     db.init_app(app)
 
+    login_manager.login_view = 'tinylibrary_app.login'
     login_manager.init_app(app)
-    login_manager.login_view = 'login'
 
     bcrypt.init_app(app)
 
@@ -47,8 +47,10 @@ def populate_db(app):
     co1 = Checkout(book=book1, room=room1, person=alice, return_date=datetime.now())
     co2 = Checkout(book=book2, room=room2, person=bob)
 
+    admin = Admin(username='admin@admin.com', password='whyyoumakeusread')
+
     with app.app_context():
-        for rec in (book1, book2, room1, room2, alice, bob, inactive_student, co1, co2):
+        for rec in (book1, book2, room1, room2, alice, bob, inactive_student, co1, co2, admin):
             db.session.add(rec)
             print repr(rec), 'added'
 
