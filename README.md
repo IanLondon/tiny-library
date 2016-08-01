@@ -7,8 +7,9 @@ tinylibrary is a simple web app for managing small libraries.
 
 # Local development
 From the root of this repo:
-1. Activate the virtual environment: `source activate env/bin/activate`
-2. Run the app: `python tinylibrary/app.py`
+1. Make a virtual environment using `requirements.txt`
+2. Activate the virtual environment: `source activate env/bin/activate`
+3. Run the app: `python tinylibrary/app.py`
 
 For playing on the REPL while debugging or adding new features, use `ipython -i console_helper.py` to conveniently have an app context.
 
