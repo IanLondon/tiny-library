@@ -11,15 +11,16 @@
     <body>
         {% block menu %}
             <span id="menu">
-            {% if current_user.is_authenticated %}
                 <p>
+                    <a href="{{ url_for("tinylibrary_app.books")}}">Books Home</a>
+            {% if current_user.is_authenticated %}
                     <a href="{{ url_for("tinylibrary_app.add_books")}}">Add Books</a>
                     <a href="{{ url_for("tinylibrary_app.students_bulk_add")}}">Add Students</a>
                     <a href="{{ url_for("tinylibrary_app.logout")}}">Log Out</a>
-                </p>
             {% else %}
-                <p><a href="{{ url_for("tinylibrary_app.login")}}">Admin Login</a></p>
+                    <a href="{{ url_for("tinylibrary_app.login")}}">Admin Login</a>
             {% endif %}
+            </p>
         </span>
         {% endblock %}
 

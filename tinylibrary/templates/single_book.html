@@ -3,7 +3,7 @@
 {% block body %}
 <div id='title'>Title: {{ book.title }}</div>
 <div id='availability'>
-    {% if not book.is_available() %}
+    {% if not book.is_available %}
         Not available. Last checked out {{ book.last_checked_out() }}. <a href="{{ url_for('.return_book', book_id=book.id)}}">RETURN</a>
     {% else %}
         <a href="{{ url_for('.checkout', book_id=book.id)}}">AVAILABLE</a>

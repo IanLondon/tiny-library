@@ -69,7 +69,7 @@ def add_books():
 @login_required
 def checkout(book_id):
     selected_book = Book.query.get_or_404(book_id)
-    if not selected_book.is_available():
+    if not selected_book.is_available:
         flash('"%s" (ID: %s) is already checked out. It must be returned before you can check it out.' % (selected_book.title, selected_book.inside_cover_id), category='error')
         return redirect(url_for('.books'))
 
@@ -89,7 +89,7 @@ def checkout(book_id):
 @login_required
 def return_book(book_id):
     selected_book = Book.query.get_or_404(book_id)
-    if selected_book.is_available():
+    if selected_book.is_available:
         flash('"%s" (ID: %s) is not checked out. It cannot be returned.' % (selected_book.title, selected_book.inside_cover_id), category='error')
         return redirect(url_for('.books'))
     return_form = ReturnForm()
@@ -132,7 +132,24 @@ def books():
         # If there are args that don't include id, filter by all of them
         # TODO: make this more useful/robust, use fuzzy matching on title & description
 
-        return render_template('show_books.html', books=Book.query.filter_by(**request.args.to_dict()).all())
+        # Base book query
+        book_query = Book.query
+
+        if 'title_contains' in request.args:
+            title_sub = request.args['title_contains']
+            book_query = book_query.filter( Book.title.like('%' + title_sub + '%') )
+        if 'is_available' in request.args:
+            is_unavailable_query = Book.checkout.any(return_date=None)
+            if request.args['is_available'] == 'True':
+                # available books
+                book_query = book_query.filter(~is_unavailable_query)
+                # not available (checked out) books
+            else:
+                book_query = book_query.filter(is_unavailable_query)
+
+        # selected_books = Book.query.filter_by(**request.args.to_dict()).all()
+
+        return render_template('show_books.html', books=book_query.all())
 
     # No args
     return render_template('show_books.html', books=Book.query.all())

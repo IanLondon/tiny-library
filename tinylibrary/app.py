@@ -9,7 +9,7 @@ import urlparse
 import os
 from datetime import datetime
 
-def create_app():
+def create_app(TINYLIBRARY_SQLITE3_PATH='/tmp/tinylibrary.db'):
     """Create a SQLite-backed app and populates it for local development"""
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + TINYLIBRARY_SQLITE3_PATH
@@ -57,8 +57,8 @@ def populate_db(app):
     print 'added some data'
 
 if __name__ == '__main__':
-    TINYLIBRARY_SQLITE3_PATH = '/tmp/tinylibrary.db'
-    app = create_app()
+    TINYLIBRARY_SQLITE3_PATH='/tmp/tinylibrary.db'
+    app = create_app(TINYLIBRARY_SQLITE3_PATH)
     #Because this is just a demonstration we set up the database like this.
     if not os.path.isfile(TINYLIBRARY_SQLITE3_PATH):
         print "no database found. making one..."

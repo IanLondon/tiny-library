@@ -65,6 +65,7 @@ class Book(db.Model):
         # allow chaining
         return self
 
+    @property
     def is_available(self):
         """True if available, ie true if not currently checked out. False otherwise."""
         return self.checkout.filter(Checkout.return_date == None).count() == 0

@@ -4,6 +4,10 @@
 {% block title %}All the books{% endblock %}
 {% block body %}
 {{ simple_flash() }}
+<span id="book_filter">
+    <div>Title</div>
+    <div></div>
+</span>
 <table>
     <tr>
         <th>Cover Image</th>
@@ -17,7 +21,10 @@
     <tr>
         <td>{% if book.thumbnail_url %}<img src="{{ book.thumbnail_url }}">{% endif %}</td>
         <td><a href="{{ url_for('.books', id=book.id)}}">{{ book.title }}</a>
-            {% if not book.is_available() %}<br>CHECKED OUT{% endif %}</td>
+            {% if not book.is_available %}
+                <p>CHECKED OUT</p>
+            {% endif %}
+        </td>
         <td>{{ book.inside_cover_id }}</td>
         <td>{% if book.description%}{{ book.teaser() }}...{% endif %}</td>
         <td>{{ book.isbn13 }}</td>
