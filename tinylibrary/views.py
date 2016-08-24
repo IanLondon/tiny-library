@@ -45,6 +45,8 @@ class LoginForm(Form):
 # Views #
 #########
 
+# Authenticated views
+
 @tinylibrary_app.route('/add_books/', methods=['GET','POST'])
 @login_required
 def add_books():
@@ -115,6 +117,10 @@ def students_bulk_add():
     return render_template('add_students_csv.html')
 
 # Public views
+
+@tinylibrary_app.route('/')
+def redirect_to_books():
+    return redirect(url_for('tinylibrary_app.books'))
 
 @tinylibrary_app.route('/books/')
 def books():

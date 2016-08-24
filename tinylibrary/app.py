@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 
 def create_app():
+    """Create a SQLite-backed app and populates it for local development"""
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + TINYLIBRARY_SQLITE3_PATH
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True #XXX:???
