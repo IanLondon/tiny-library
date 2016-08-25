@@ -9,6 +9,8 @@ import urlparse
 import os
 from datetime import datetime
 
+import logging
+
 def create_app(TINYLIBRARY_SQLITE3_PATH='/tmp/tinylibrary.db'):
     """Create a SQLite-backed app and populates it for local development"""
     app = Flask(__name__)
@@ -24,6 +26,15 @@ def create_app(TINYLIBRARY_SQLITE3_PATH='/tmp/tinylibrary.db'):
     bcrypt.init_app(app)
 
     app.register_blueprint(tinylibrary_app)
+
+    # setup logging
+    from logging.handlers import RotatingFileHandler
+    file_handler = RotatingFileHandler('flask.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+    file_handler.setLevel(logging.ERROR)
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    file_handler.setFormatter(formatter)
+    app.logger.addHandler(file_handler)
+
     return app
 
 def init_db(app):
