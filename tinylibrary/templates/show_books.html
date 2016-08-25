@@ -5,8 +5,20 @@
 {% block body %}
 {{ simple_flash() }}
 <span id="book_filter">
-    <div>Title</div>
-    <div></div>
+    <form method="GET" action={{ url_for('.books') }}>
+        <label>
+            Availability:
+            <select name="is_available">
+                <option disabled selected value>---</option>
+                <option value="True">Available</option>
+                <option value="False">Checked out</option>
+            </select>
+        </label>
+        <label>
+            Title contains: <input name="title_contains" type="text" />
+        </label>
+        <input type="submit" value="Go">
+    </form>
 </span>
 <table>
     <tr>

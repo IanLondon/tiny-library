@@ -18,6 +18,5 @@ The local development version uses a sqlite3 database created at `/tmp/tinylibra
 The default books added don't use the Google Books API so they're ugly entries. Toss a few real books in there, like `9781491912768` (Advanced Analytics with Spark :p )
 
 # TODO:
-* Add a navbar for admin
 * Add sorting/filtering options
 * Make it prettier

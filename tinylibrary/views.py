@@ -41,6 +41,12 @@ class LoginForm(Form):
     username = EmailField('Username (Email address)', [validators.DataRequired(), validators.Email()])
     password = PasswordField(validators=[validators.DataRequired()])
 
+# XXX: never used
+# class BookFilterForm(Form):
+#     is_available = SelectField("Checked out",
+#         choices=[('',''),("True","Available"),("False","Checked out")])
+#     title_contains = StringField()
+
 #########
 # Views #
 #########
@@ -136,8 +142,10 @@ def books():
         book_query = Book.query
 
         if 'title_contains' in request.args:
-            title_sub = request.args['title_contains']
-            book_query = book_query.filter( Book.title.like('%' + title_sub + '%') )
+            title_sub = request.args['title_contains'].strip()
+            # don't waste the extra filter on blank string
+            if title_sub != "":
+                book_query = book_query.filter( Book.title.like('%' + title_sub + '%') )
         if 'is_available' in request.args:
             is_unavailable_query = Book.checkout.any(return_date=None)
             if request.args['is_available'] == 'True':
