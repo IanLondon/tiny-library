@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 {% from 'flash_macros.html' import simple_flash %}
-{% from 'form_macros.html' import form_uls %}
+{% from 'bootstrap_form_macros.html' import render_form %}
 {% block title %}Add books to database{% endblock %}
 {% block body %}
 {{ simple_flash() }}
-<form method="POST" action={{ url_for('.add_books') }}>
-    {{ form_uls(form) }}
-    <input type="submit" value="+">
-</form>
+<!-- <form method="POST" action={{ url_for('.add_books') }}>
+    <div class="form-group">
+        \{\{ form_uls(form) }}
+        <input type="submit" value="+">
+    </div>
+</form> -->
+<div class="add-book-form">
+    {{ render_form(form, action_url=url_for('.add_books'), action_text="+") }}
+</div>
 <img id="cover_img" src="{{ url_for('.static', filename='img/iranian_cover.jpg') }}" alt='book cover image'>
 {% endblock %}
 {% block scripts %}

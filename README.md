@@ -18,5 +18,9 @@ The local development version uses a sqlite3 database created at `/tmp/tinylibra
 The default books added don't use the Google Books API so they're ugly entries. Toss a few real books in there, like `9781491912768` (Advanced Analytics with Spark :p )
 
 # TODO:
-* Add sorting/filtering options
-* Make it prettier
+* Admin control of students and rooms
+* Do not allow books with no title
+* Watch out for users quickly adding without letting Google Books info populate - you'd get no title, just ISBN. ("Do not allow books with no title" helps with this...)
+* Test on mobile
+* Let Admin DELETE book
+* Control `cover image` size in `/books/` - it's rather chaotic

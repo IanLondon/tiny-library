@@ -4,23 +4,23 @@
 {% block title %}All the books{% endblock %}
 {% block body %}
 {{ simple_flash() }}
-<span id="book_filter">
-    <form method="GET" action={{ url_for('.books') }}>
+<nav id="book_filter" class="navbar navbar-default"><div class="container-fluid">
+    <form class="navbar-form navbar-left" method="GET" action={{ url_for('.books') }}><div class="form-group">
         <label>
             Availability:
-            <select name="is_available">
+            <select name="is_available" class="form-control">
                 <option disabled selected value>---</option>
                 <option value="True">Available</option>
                 <option value="False">Checked out</option>
             </select>
         </label>
         <label>
-            Title contains: <input name="title_contains" type="text" />
+            Title contains: <input name="title_contains" type="text" class="form-control"/>
         </label>
-        <input type="submit" value="Go">
-    </form>
-</span>
-<table>
+        <button type="submit">Go</button>
+    </div></form>
+</div></nav>
+<table class="table">
     <tr>
         <th>Cover Image</th>
         <th>Title</th>
@@ -34,7 +34,7 @@
         <td>{% if book.thumbnail_url %}<img src="{{ book.thumbnail_url }}">{% endif %}</td>
         <td><a href="{{ url_for('.books', id=book.id)}}">{{ book.title }}</a>
             {% if not book.is_available %}
-                <p>CHECKED OUT</p>
+                <p class="checked-out">CHECKED OUT</p>
             {% endif %}
         </td>
         <td>{{ book.inside_cover_id }}</td>

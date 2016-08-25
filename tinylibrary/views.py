@@ -68,7 +68,7 @@ def add_books():
         flash('Added ISBN#%s "%s"' % (add_book_form.isbn13.data, add_book_form.title.data), category='success')
         return redirect(url_for('.add_books'))
     if add_book_form.is_submitted():
-        flash('There was an error with your submission', category='error')
+        flash('There was an error with your submission', category='danger')
     return render_template('add_books.html', form=add_book_form)
 
 @tinylibrary_app.route('/checkout/<int:book_id>', methods=['GET','POST'])
@@ -76,7 +76,7 @@ def add_books():
 def checkout(book_id):
     selected_book = Book.query.get_or_404(book_id)
     if not selected_book.is_available:
-        flash('"%s" (ID: %s) is already checked out. It must be returned before you can check it out.' % (selected_book.title, selected_book.inside_cover_id), category='error')
+        flash('"%s" (ID: %s) is already checked out. It must be returned before you can check it out.' % (selected_book.title, selected_book.inside_cover_id), category='danger')
         return redirect(url_for('.books'))
 
     checkout_form = CheckoutForm()
@@ -96,7 +96,7 @@ def checkout(book_id):
 def return_book(book_id):
     selected_book = Book.query.get_or_404(book_id)
     if selected_book.is_available:
-        flash('"%s" (ID: %s) is not checked out. It cannot be returned.' % (selected_book.title, selected_book.inside_cover_id), category='error')
+        flash('"%s" (ID: %s) is not checked out. It cannot be returned.' % (selected_book.title, selected_book.inside_cover_id), category='danger')
         return redirect(url_for('.books'))
     return_form = ReturnForm()
     if return_form.validate_on_submit():
@@ -171,7 +171,7 @@ def login():
             login_user(registered_user, remember=True)
             flash('Logged in successfully. Hello %s!' % (registered_user.username), category='success')
             return redirect(url_for('tinylibrary_app.books'))
-        flash('Username or Password is invalid' , 'error')
+        flash('Username or Password is invalid' , category='warning')
     return render_template('login.html', form=login_form)
 
 @tinylibrary_app.route('/logout')
@@ -180,7 +180,7 @@ def logout():
         flash('Logged out %s.' % current_user.username, category='success')
         logout_user()
     else:
-        flash('Already logged out.', category='error')
+        flash('Already logged out.', category='danger')
     return redirect(url_for('tinylibrary_app.books'))
 
 @login_manager.user_loader

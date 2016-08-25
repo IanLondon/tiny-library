@@ -1,16 +1,36 @@
 {% extends 'base.html' %}
 {% block title %}{{ book.title }}{% endblock %}
 {% block body %}
-<div id='title'>Title: {{ book.title }}</div>
-<div id='availability'>
-    {% if not book.is_available %}
-        Not available. Last checked out {{ book.last_checked_out() }}. <a href="{{ url_for('.return_book', book_id=book.id)}}">RETURN</a>
-    {% else %}
-        <a href="{{ url_for('.checkout', book_id=book.id)}}">AVAILABLE</a>
-    {% endif %}
-</div>
-<div id='isbn13'>ISBN13: {{ book.isbn13 }}</div>
-<div id='inside_cover_id'>Custom ID: {{ book.inside_cover_id }}</div>
-<div id='description'>Description: {{ book.description }}</div>
-<img id="thumbnail_img" src="{{book.thumbnail_url}}">
+<table class="table table-striped">
+    <tr>
+        <th>Title:</th>
+        <td>{{ book.title }}</td>
+    </tr>
+    <tr>
+        <th>Status:</th>
+        <td>
+            {% if not book.is_available %}
+            <a href="{{ url_for('.return_book', book_id=book.id)}}" class="btn btn-primary">RETURN</a>
+            Checked out {{ book.last_checked_out() }}.
+            {% else %}
+                <a href="{{ url_for('.checkout', book_id=book.id)}}" class="btn btn-primary">AVAILABLE</a>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th>ISBN13:</th> <td> {{ book.isbn13 }}</td>
+    </tr>
+    <tr>
+        <th>Custom ID:</th>
+        <td>{{ book.inside_cover_id }}</td>
+    </tr>
+    <tr>
+        <th>Description:</th>
+        <td>{{ book.description }}</td>
+    </tr>
+    <tr>
+        <th>Cover Image:</th>
+        <td><img id="thumbnail_img" src="{{book.thumbnail_url}}"></td>
+    </tr>
+</table>
 {% endblock %}
